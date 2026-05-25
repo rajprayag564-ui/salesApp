@@ -1,0 +1,145 @@
+/* =============================================================================
+   Tailwind CSS v4 — single import replaces the three @tailwind directives
+   ============================================================================= */
+@import "tailwindcss";
+
+/* =============================================================================
+   Design tokens — CSS custom properties
+   ============================================================================= */
+:root {
+  --sidebar-width: 256px;
+  --header-height: 64px;
+}
+
+/* =============================================================================
+   Base layer overrides
+   ============================================================================= */
+@layer base {
+  html {
+    font-family: var(--font-inter), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-slate-950 text-slate-100 min-h-screen;
+  }
+
+  * {
+    @apply border-slate-700;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-600 rounded-full;
+  }
+}
+
+/* =============================================================================
+   Component utilities — shorthand classes used across all pages
+   ============================================================================= */
+@layer components {
+
+  /* ── Cards ─────────────────────────────────────────── */
+  .card {
+    @apply bg-slate-900 border border-slate-800 rounded-xl p-6;
+  }
+
+  /* ── Form inputs ────────────────────────────────────── */
+  .input {
+    @apply w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-lg px-3 py-2
+           text-sm placeholder:text-slate-500
+           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+           transition-colors;
+  }
+
+  .label {
+    @apply block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wide;
+  }
+
+  /* ── Buttons ────────────────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-indigo-600 hover:bg-indigo-500 text-white
+           text-sm font-medium rounded-lg px-4 py-2
+           transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-slate-800 hover:bg-slate-700 text-slate-200
+           text-sm font-medium rounded-lg px-4 py-2
+           transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2
+           bg-red-900/40 hover:bg-red-800/60 text-red-400
+           text-sm font-medium rounded-lg px-4 py-2
+           transition-colors;
+  }
+
+  /* ── Tables ─────────────────────────────────────────── */
+  .table-wrap {
+    @apply w-full overflow-x-auto rounded-xl border border-slate-800;
+  }
+
+  table.crm-table {
+    @apply w-full text-sm;
+  }
+
+  table.crm-table thead {
+    @apply bg-slate-800/60;
+  }
+
+  table.crm-table th {
+    @apply text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3;
+  }
+
+  table.crm-table td {
+    @apply px-4 py-3 text-slate-200 border-t border-slate-800;
+  }
+
+  table.crm-table tbody tr {
+    @apply hover:bg-slate-800/40 transition-colors;
+  }
+
+  /* ── Badges ─────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full;
+  }
+
+  .badge-green  { @apply inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-900/50 text-emerald-400 border border-emerald-800; }
+  .badge-yellow { @apply inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-900/50 text-amber-400 border border-amber-800; }
+  .badge-blue   { @apply inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-900/50 text-blue-400 border border-blue-800; }
+  .badge-red    { @apply inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-900/50 text-red-400 border border-red-800; }
+  .badge-slate  { @apply inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700; }
+
+  /* ── Page header ─────────────────────────────────────── */
+  .page-header {
+    @apply flex items-center justify-between mb-6;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold text-slate-100;
+  }
+
+  .page-subtitle {
+    @apply text-sm text-slate-400 mt-0.5;
+  }
+
+  /* ── Alert / error banners ──────────────────────────── */
+  .alert-error {
+    @apply flex items-center gap-2 text-sm text-red-400
+           bg-red-900/30 border border-red-800 rounded-lg px-4 py-3;
+  }
+
+  .alert-success {
+    @apply flex items-center gap-2 text-sm text-emerald-400
+           bg-emerald-900/30 border border-emerald-800 rounded-lg px-4 py-3;
+  }
+}
