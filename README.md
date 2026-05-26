@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+FMCG Sales CRM is a [Next.js](https://nextjs.org) app for the admin dashboard.
 
 ## Getting Started
 
@@ -31,6 +31,20 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This repository is ready for Vercel deployment as the main Next.js app at the repo root.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Before deploying, set these environment variables in Vercel:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Deployment steps:
+
+1. Push the repo to GitHub.
+2. Import the GitHub repo into Vercel.
+3. Set the environment variables above in the Vercel project settings.
+4. Keep the default build command `npm run build` and output handled by Next.js.
+5. Deploy the `main` branch.
+
+If you want the mobile app in `field-agent-app/` deployed separately, create a second Vercel project for that folder or keep it as a separate repo.

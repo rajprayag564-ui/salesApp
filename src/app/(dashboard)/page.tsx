@@ -18,17 +18,30 @@ export default async function DashboardPage() {
 
   const today = new Date().toISOString().split('T')[0];
 
-  // Fetch today's agent daily summary
-  const { data: summaries } = await supabase
-    .from('agent_daily_summary')
-    .select('*')
-    .eq('visit_date', today);
+  // Fetch today's agent daily summary and route assignments.
+  const [{ data: summaries }, { data: assignments }] = await Promise.all([
+    supabase
+      .from('agent_daily_summary')
+      .select('*')
+      .eq('visit_date', today),
+    supabase
+      .from('route_assignments')
+      .select('agent_id')
+      .eq('assigned_date', today),
+  ]);
 
   const rows = summaries ?? [];
+  const assignmentCountByAgent = (assignments ?? []).reduce((acc, row) => {
+    const key = String(row.agent_id);
+    acc.set(key, (acc.get(key) ?? 0) + 1);
+    return acc;
+  }, new Map<string, number>());
 
   const totalVisits = rows.reduce((s, r) => s + Number(r.total_visits ?? 0), 0);
   const totalOrderValue = rows.reduce((s, r) => s + Number(r.total_order_value ?? 0), 0);
   const totalCollected = rows.reduce((s, r) => s + Number(r.total_collected ?? 0), 0);
+  const totalAssignedOutlets = Array.from(assignmentCountByAgent.values()).reduce((s, count) => s + count, 0);
+  const routeCompletion = totalAssignedOutlets > 0 ? Math.min(100, Math.round((totalVisits / totalAssignedOutlets) * 100)) : 0;
 
   return (
     <>
@@ -42,7 +55,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
         <StatCard
           title="Visits Today"
           value={totalVisits}
@@ -77,6 +90,17 @@ export default async function DashboardPage() {
             </svg>
           }
         />
+        <StatCard
+          title="Route Completion"
+          value={`${routeCompletion}%`}
+          subtitle={`${totalVisits}/${totalAssignedOutlets || 0} assigned outlets visited`}
+          colorClass="text-cyan-400"
+          icon={
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5.25h6m-9 4.5h12m-9 4.5h6M4.5 19.5h15a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5h-15A1.5 1.5 0 0 0 3 6v12a1.5 1.5 0 0 0 1.5 1.5Z" />
+            </svg>
+          }
+        />
       </div>
 
       {/* Agent-wise summary table */}
@@ -90,7 +114,9 @@ export default async function DashboardPage() {
               <thead>
                 <tr>
                   <th>Agent</th>
+                  <th>Assigned Outlets</th>
                   <th>Visits</th>
+                  <th>Route %</th>
                   <th>Orders</th>
                   <th>Order Value</th>
                   <th>Collected</th>
@@ -99,11 +125,23 @@ export default async function DashboardPage() {
               <tbody>
                 {rows.map((row) => (
                   <tr key={String(row.agent_id)}>
+                    {(() => {
+                      const assigned = assignmentCountByAgent.get(String(row.agent_id)) ?? 0;
+                      const visited = Number(row.total_visits ?? 0);
+                      const completion = assigned > 0 ? Math.min(100, Math.round((visited / assigned) * 100)) : 0;
+
+                      return (
+                        <>
                     <td className="font-medium">{String(row.agent_name)}</td>
+                    <td>{assigned}</td>
                     <td>{String(row.total_visits)}</td>
+                    <td>{completion}%</td>
                     <td>{String(row.total_orders)}</td>
                     <td className="tabular-nums">{formatINR(Number(row.total_order_value))}</td>
                     <td className="tabular-nums">{formatINR(Number(row.total_collected))}</td>
+                        </>
+                      );
+                    })()}
                   </tr>
                 ))}
               </tbody>
