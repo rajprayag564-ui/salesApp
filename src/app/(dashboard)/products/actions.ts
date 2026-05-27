@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createServerClient } from '@/lib/supabase';
+import { ensureAdmin } from '@/lib/auth';
 
 export type ActionState = {
   error?: string;
@@ -59,7 +60,7 @@ export async function adjustStock(
 ): Promise<ActionState> {
   const product_id = formData.get('product_id') as string;
   const quantity_change = parseInt(formData.get('quantity_change') as string, 10);
-  const reason = formData.get('reason') as string;
+  let reason = formData.get('reason') as string;
   const notes = (formData.get('notes') as string)?.trim() || null;
 
   if (!product_id) return { error: 'Please select a product.' };
@@ -70,6 +71,23 @@ export async function adjustStock(
   const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated.' };
+
+  // server-side guard: only admins may adjust product stock or create products
+  const admin = await ensureAdmin();
+  if (!admin) return { error: 'Not authorized.' };
+
+  // Server-side validation: normalize unknown reasons to 'adjustment'
+  const ALLOWED_REASONS = [
+    'initial_stock',
+    'sale',
+    'adjustment',
+    'purchase',
+    'return',
+    'damage',
+  ];
+  if (!reason || !ALLOWED_REASONS.includes(reason)) {
+    reason = 'adjustment';
+  }
 
   const { error } = await supabase.from('stock_transactions').insert({
     product_id,

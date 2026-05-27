@@ -1,8 +1,19 @@
 import { createServerClient } from '@/lib/supabase';
+import { ensureAdmin } from '@/lib/auth';
 
 export const revalidate = 0;
 
 export default async function StockTransactionsList() {
+  // restrict viewing to admin users
+  const admin = await ensureAdmin();
+  if (!admin) {
+    return (
+      <div className="mt-6 card">
+        <p className="text-center text-slate-500 py-6">Not authorized.</p>
+      </div>
+    );
+  }
+
   const supabase = await createServerClient();
 
   const { data: txns } = await supabase
