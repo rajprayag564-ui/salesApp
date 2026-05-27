@@ -25,6 +25,28 @@ export async function signIn(
     return { error: error.message };
   }
 
+  // After sign-in, ensure the authenticated user is an active admin employee.
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Authentication failed.' };
+  }
+
+  const { data: employee } = await supabase
+    .from('employees')
+    .select('role, is_active')
+    .eq('id', user.id)
+    .single();
+
+  if (!employee || employee.role !== 'admin' || !employee.is_active) {
+    // sign the user out so they don't retain a session for the admin panel
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      // ignore
+    }
+    return { error: 'Only active admin users may sign into the admin panel.' };
+  }
+
   // redirect() throws NEXT_REDIRECT — must be outside try/catch
   redirect('/');
 }
