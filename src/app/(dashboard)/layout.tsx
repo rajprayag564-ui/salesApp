@@ -17,9 +17,14 @@ export default async function DashboardLayout({
   // Fetch employee profile for sidebar display
   const { data: profile } = await supabase
     .from('employees')
-    .select('name, email')
+    .select('name, email, role, is_active')
     .eq('id', user.id)
     .single();
+
+  // If the user is not an active admin, redirect them to the agent area
+  if (!profile || profile.role !== 'admin' || !profile.is_active) {
+    redirect('/visits');
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-950">

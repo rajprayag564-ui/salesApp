@@ -1,3 +1,4 @@
+
 -- Migration: update allowed values for stock_transactions.reason
 -- Run this in Supabase SQL editor as a project admin.
 
